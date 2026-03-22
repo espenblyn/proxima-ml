@@ -1,4 +1,8 @@
 use num_traits::Float;
+use std::iter::Sum;
+
+mod euclidean;
+pub use euclidean::{Euclidean, SqEuclidean};
 
 // Validation
 
@@ -14,7 +18,7 @@ fn validate_lengths<F>(a: &[F], b: &[F]) {
 
 // Defining traits
 
-pub trait Distance<F: Float> {
+pub trait Distance<F: Float + Sum> {
     fn distance(a: &[F], b: &[F]) -> F;
 
     fn batch_distance(a: &[F], targets: &[Vec<F>]) -> Vec<F> {
@@ -29,7 +33,7 @@ pub trait Distance<F: Float> {
     }
 }
 
-pub trait Similarity<F: Float> {
+pub trait Similarity<F: Float + Sum> {
     fn similarity(a: &[F], b: &[F]) -> F;
 
     fn batch_similarity(a: &[F], targets: &[Vec<F>]) -> Vec<F> {
