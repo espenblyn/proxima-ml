@@ -92,4 +92,23 @@ mod tests {
         let b: [f32; 2] = [1.0, 0.0];
         assert_abs_diff_eq!(Cosine::similarity(&a, &b), 1.0_f32);
     }
+
+    #[test]
+    fn cosine_batch_similarity() {
+        let query = [1.0, 0.0];
+        let targets = vec![vec![1.0, 0.0], vec![0.0, 1.0], vec![1.0, 1.0]];
+        let similarities = Cosine::batch_similarity(&query, &targets);
+        assert_abs_diff_eq!(similarities[0], 1.0);
+        assert_abs_diff_eq!(similarities[1], 0.0);
+        assert_abs_diff_eq!(similarities[2], 0.707107, epsilon = 1e-6);
+    }
+
+    #[test]
+    fn cosine_batch_distance() {
+        let query = [1.0, 0.0];
+        let targets = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+        let distances = Cosine::batch_distance(&query, &targets);
+        assert_abs_diff_eq!(distances[0], 0.0);
+        assert_abs_diff_eq!(distances[1], 1.0);
+    }
 }

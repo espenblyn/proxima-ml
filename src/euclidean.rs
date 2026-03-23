@@ -90,4 +90,35 @@ mod tests {
         let b: [f32; 2] = [3.0, 4.0];
         assert_abs_diff_eq!(Euclidean::distance(&a, &b), 5.0_f32);
     }
+
+    #[test]
+    fn euclidean_batch_distance() {
+        let query = [0.0, 0.0];
+        let targets = vec![vec![3.0, 4.0], vec![1.0, 0.0], vec![0.0, 2.0]];
+        let distances = Euclidean::batch_distance(&query, &targets);
+        assert_abs_diff_eq!(distances[0], 5.0);
+        assert_abs_diff_eq!(distances[1], 1.0);
+        assert_abs_diff_eq!(distances[2], 2.0);
+    }
+
+    #[test]
+    fn euclidean_pairwise_distances() {
+        let points = vec![vec![0.0, 0.0], vec![3.0, 4.0], vec![1.0, 0.0]];
+        let matrix = Euclidean::pairwise_distances(&points);
+
+        // Diagonal is always zero
+        assert_abs_diff_eq!(matrix[0][0], 0.0);
+        assert_abs_diff_eq!(matrix[1][1], 0.0);
+        assert_abs_diff_eq!(matrix[2][2], 0.0);
+
+        // Symmetric: d(a,b) == d(b,a)
+        assert_abs_diff_eq!(matrix[0][1], matrix[1][0]);
+        assert_abs_diff_eq!(matrix[0][2], matrix[2][0]);
+        assert_abs_diff_eq!(matrix[1][2], matrix[2][1]);
+
+        // Known values
+        assert_abs_diff_eq!(matrix[0][1], 5.0);
+        assert_abs_diff_eq!(matrix[0][2], 1.0);
+        assert_abs_diff_eq!(matrix[1][2], 4.472136, epsilon = 1e-6);
+    }
 }
