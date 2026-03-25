@@ -23,13 +23,13 @@ pub trait DistanceExt<F: Float + Sum>: Distance<F> {
         Self::compute(a_cow.as_ref(), b_cow.as_ref())
     }
 
-    fn batch_distance<'a, T>(
-        query: impl IntoSlice<'a, F>,
+    fn batch_distance<'q, 't, T>(
+        query: impl IntoSlice<'q, F>,
         targets: impl IntoIterator<Item = T>,
     ) -> Vec<F>
     where
-        T: IntoSlice<'a, F>,
-        F: 'a,
+        T: IntoSlice<'t, F>,
+        F: 'q + 't,
     {
         let query_cow = query.into_slice();
         let query_ref = query_cow.as_ref();
@@ -83,13 +83,13 @@ pub trait SimilarityExt<F: Float + Sum>: Similarity<F> {
         Self::compute_similarity(a_cow.as_ref(), b_cow.as_ref())
     }
 
-    fn batch_similarity<'a, T>(
-        query: impl IntoSlice<'a, F>,
+    fn batch_similarity<'q, 't, T>(
+        query: impl IntoSlice<'q, F>,
         targets: impl IntoIterator<Item = T>,
     ) -> Vec<F>
     where
-        T: IntoSlice<'a, F>,
-        F: 'a,
+        T: IntoSlice<'t, F>,
+        F: 'q + 't,
     {
         let query_cow = query.into_slice();
         let query_ref = query_cow.as_ref();

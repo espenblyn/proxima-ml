@@ -5,20 +5,67 @@ pub trait IntoSlice<'a, F: Clone> {
 }
 
 impl<'a, F: Clone, const N: usize> IntoSlice<'a, F> for &'a [F; N] {
+    #[inline]
     fn into_slice(self) -> Cow<'a, [F]> {
         Cow::Borrowed(self.as_slice())
     }
 }
 
 impl<'a, F: Clone> IntoSlice<'a, F> for &'a [F] {
+    #[inline]
     fn into_slice(self) -> Cow<'a, [F]> {
         Cow::Borrowed(self)
     }
 }
 
 impl<'a, F: Clone> IntoSlice<'a, F> for &'a Vec<F> {
+    #[inline]
     fn into_slice(self) -> Cow<'a, [F]> {
         Cow::Borrowed(self.as_slice())
+    }
+}
+
+#[cfg(feature = "ndarray")]
+use ndarray::{ArrayBase, ArrayView1, Data, Ix1};
+
+#[cfg(feature = "ndarray")]
+impl<'a, F, S> IntoSlice<'a, F> for &'a ArrayBase<S, Ix1>
+where
+    F: Clone,
+    S: Data<Elem = F>,
+{
+    #[inline]
+    fn into_slice(self) -> Cow<'a, [F]> {
+        match self.as_slice() {
+            Some(s) => Cow::Borrowed(s),
+            None => {
+                debug_assert!(
+                    false,
+                    "proxima-ml warning: Strided ndarray view caused a heap allocation!"
+                );
+                Cow::Owned(self.to_vec())
+            }
+        }
+    }
+}
+
+#[cfg(feature = "ndarray")]
+impl<'a, F> IntoSlice<'a, F> for ArrayView1<'a, F>
+where
+    F: Clone,
+{
+    #[inline]
+    fn into_slice(self) -> Cow<'a, [F]> {
+        match self.to_slice() {
+            Some(s) => Cow::Borrowed(s),
+            None => {
+                debug_assert!(
+                    false,
+                    "proxima-ml warning: Strided ndarray view caused a heap allocation!"
+                );
+                Cow::Owned(self.to_vec())
+            }
+        }
     }
 }
 
@@ -113,30 +160,6 @@ mod ndarray_tests {
         let a = array![1.0, 2.0, 3.0, 4.0];
         let view = a.slice(ndarray::s![0..2]);
         let b = array![3.0, 4.0];
-        assert_abs_diff_eq!(Euclidean::distance(&view, &b), 2.8284271247461903);
-    }
-}
-
-#[cfg(feature = "ndarray")]
-use ndarray::{ArrayBase, Data, Ix1};
-
-#[cfg(feature = "ndarray")]
-impl<'a, F, S> IntoSlice<'a, F> for &'a ArrayBase<S, Ix1>
-where
-    F: Clone,
-    S: Data<Elem = F>,
-{
-    fn into_slice(self) -> Cow<'a, [F]> {
-        match self.as_slice() {
-            Some(s) => Cow::Borrowed(s),
-            None => {
-                debug_assert!(
-                    false,
-                    "proxima-ml warning: Strided ndarray view caused a hidden heap allocation! \
-                     Consider using `.as_standard_layout()` before passing to distance metric."
-                );
-                Cow::Owned(self.to_vec())
-            }
-        }
+        assert_abs_diff_eq!(Euclidean::distance(&view, &b), 8.0_f64.sqrt());
     }
 }
