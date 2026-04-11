@@ -56,7 +56,7 @@ Measured on Apple M-series, single-threaded, `f64` vectors. Run `cargo bench` to
 | Euclidean | 30 ns | 319 ns | 731 ns |
 | SqEuclidean | 30 ns | 326 ns | 735 ns |
 | Canberra | 48 ns | 379 ns | 786 ns |
-| Cosine | 84 ns | 882 ns | 2063 ns |
+| Cosine | 53 ns | 408 ns | 837 ns |
 
 Sorted by 768d performance. All metrics scale linearly with dimension.
 
