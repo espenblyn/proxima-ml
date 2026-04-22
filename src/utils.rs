@@ -25,6 +25,11 @@ impl<'a, F: Clone> IntoSlice<'a, F> for &'a Vec<F> {
     }
 }
 
+pub fn condensed_index(n: usize, i: usize, j: usize) -> usize {
+    let (i, j) = if i < j { (i, j) } else { (j, i) };
+    n * i - i * (i + 1) / 2 + (j - i - 1)
+}
+
 #[cfg(feature = "ndarray")]
 use ndarray::{ArrayBase, ArrayView1, Data, Ix1};
 
