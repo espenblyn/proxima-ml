@@ -58,6 +58,23 @@ pub trait DistanceExt<F: Float + Sum>: Distance<F> {
             })
             .collect()
     }
+
+    fn pdist<'a, T>(points: &'a [T]) -> Vec<F>
+    where
+        T: AsRef<[F]>,
+        F: 'a,
+    {
+        let n = points.len();
+        let mut result = Vec::with_capacity(n * (n - 1) / 2);
+
+        for i in 0..n {
+            for j in (i + 1)..n {
+                result.push(Self::compute(points[i].as_ref(), points[j].as_ref()));
+            }
+        }
+
+        result
+    }
 }
 
 impl<T: Distance<F>, F: Float + Sum> DistanceExt<F> for T {}

@@ -20,4 +20,5 @@ pub use jaccard::Jaccard;
 pub use manhattan::Manhattan;
 pub use traits::{Distance, DistanceExt, Similarity, SimilarityExt};
 pub use utils::IntoSlice;
+pub use utils::condensed_index;
 pub use validation::validate_lengths;
